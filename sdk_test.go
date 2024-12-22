@@ -8,9 +8,13 @@ import (
 )
 
 const remote = "http://localhost:8080"
-const key = "1234:test"
+const identifier = "187"
+const key = "123456"
 
 func TestClientInit(t *testing.T) {
-	conf := config.WithAuth(remote, key)
-	client.New(*conf)
+	conf := config.WithAuth(remote, identifier, key)
+	c := client.New(*conf)
+	if c == nil {
+		t.Fatal("Failed to initialize client")
+	}
 }
