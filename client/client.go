@@ -39,3 +39,9 @@ func (c *Client) ListLicenses(ctx context.Context) ([]models.Apikey, error) {
 
 // TODO: should this be available at this point?
 func (c *Client) CreateKey(ctx context.Context) {}
+
+// fetch makes an authenticated request to the servlicense API
+func (c *Client) MakeRequest(ctx context.Context, endpoint string, method string, body interface{}) ([]byte, error) {
+
+	return nil, nil
+}
