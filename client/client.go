@@ -1,7 +1,12 @@
 package client
 
 import (
+	"bytes"
 	"context"
+	"encoding/base64"
+	"io"
+	"net/http"
+	"strings"
 
 	"github.com/servlicense/go-sdk/config"
 	"github.com/servlicense/servlicense/api/models"
@@ -10,11 +15,13 @@ import (
 
 // Client represents the main interaction with servlicense and holds all
 // methods to call servlicense
-type Client struct{}
+type Client struct {
+	config config.Config
+}
 
 // New creates an instance of Client configured with config
 func New(config config.Config) *Client {
-	return nil
+	return &Client{config}
 }
 
 // Me returns the scopes available for the currently authenticated api key, requires authentication
@@ -37,11 +44,29 @@ func (c *Client) ListLicenses(ctx context.Context) ([]models.Apikey, error) {
 	return nil, nil
 }
 
-// TODO: should this be available at this point?
-func (c *Client) CreateKey(ctx context.Context) {}
+func (c *Client) CreateApiKey(ctx context.Context) {}
 
 // fetch makes an authenticated request to the servlicense API
-func (c *Client) MakeRequest(ctx context.Context, endpoint string, method string, body interface{}) ([]byte, error) {
+func (c *Client) makeRequest(ctx context.Context, endpoint string, method string, body []byte) ([]byte, error) {
+	client := http.Client{}
+	writer := bytes.NewReader(body)
+	req, err := http.NewRequest(method, strings.Join([]string{c.config.Server, endpoint}, "/"), writer)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	byteBuff := bytes.Buffer{}
+	byteBuff.WriteString(c.config.Identifier)
+	byteBuff.WriteRune(':')
+	byteBuff.WriteString(c.config.ApiKey)
+
+	req.Header.Set("Authorization", base64.RawStdEncoding.EncodeToString(byteBuff.Bytes()))
+
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+	return io.ReadAll(res.Body)
 }
