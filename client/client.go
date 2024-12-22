@@ -17,9 +17,14 @@ func New(config config.Config) *Client {
 	return nil
 }
 
-// Me returns the scopes available for the currently authenticated user, requires authentication
+// Me returns the scopes available for the currently authenticated api key, requires authentication
 func (c *Client) Me(ctx context.Context) ([]types.ApiKeyScope, error) {
 	return nil, nil
+}
+
+// CreateLicense creates a new license, requires authentication and admin/create_license scope
+func (c *Client) CreateLicense(ctx context.Context) (bool, error) {
+	return false, nil
 }
 
 // CheckKey returns if the given key is valid, does not require authentication
