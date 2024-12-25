@@ -48,7 +48,9 @@ func (c *Client) CreateApiKey(ctx context.Context) {}
 
 // fetch makes an authenticated request to the servlicense API
 func (c *Client) makeRequest(ctx context.Context, endpoint string, method string, body []byte) ([]byte, error) {
-	client := http.Client{}
+	client := http.Client{
+		Timeout: c.config.Timeout,
+	}
 	writer := bytes.NewReader(body)
 	req, err := http.NewRequest(method, strings.Join([]string{c.config.Server, endpoint}, "/"), writer)
 	if err != nil {
@@ -62,7 +64,7 @@ func (c *Client) makeRequest(ctx context.Context, endpoint string, method string
 
 	req.Header.Set("Authorization", base64.RawStdEncoding.EncodeToString(byteBuff.Bytes()))
 
-	res, err := client.Do(req)
+	res, err := client.Do(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}

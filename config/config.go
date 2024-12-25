@@ -1,5 +1,7 @@
 package config
 
+import "time"
+
 type Config struct {
 	// Server points to an instance of servlicense
 	Server string
@@ -7,11 +9,14 @@ type Config struct {
 	Identifier string
 	// Key is the API key
 	ApiKey string
+	// Timeout defines the timeout for the httpclient
+	Timeout time.Duration
 }
 
 func New(server string) *Config {
 	return &Config{
-		Server: server,
+		Server:  server,
+		Timeout: time.Second * 5,
 	}
 }
 
